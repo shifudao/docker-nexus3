@@ -2,7 +2,7 @@ FROM       java:8-jre-alpine
 MAINTAINER Sonatype <cloud-ops@sonatype.com>
 
 ENV NEXUS_DATA /nexus-data
-ENV NEXUS_VERSION 3.0.1-01
+ENV NEXUS_VERSION 3.0.2-02
 
 # install nexus
 RUN apk update && apk add openssl && rm -fr /var/cache/apk/*
