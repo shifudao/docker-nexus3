@@ -27,7 +27,8 @@ RUN echo "nexus:x:200:" >> /etc/group
 RUN echo "nexus:!::0:::::" >> /etc/shadow
 
 ## prevent warning: /opt/sonatype/nexus/etc/org.apache.karaf.command.acl.config.cfg (Permission denied)
-RUN chown nexus:nexus /opt/sonatype/nexus/etc/
+## prevent ERROR: OpenJDK 64-Bit Server VM warning: Cannot open file ../sonatype-work/nexus3/log/jvm.log due to Permission denied
+RUN chown nexus:nexus /opt/sonatype/nexus/etc/ /opt/sonatype-work/nexus3/log/
 
 COPY entrypoint.sh /
 
