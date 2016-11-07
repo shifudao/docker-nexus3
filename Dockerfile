@@ -13,7 +13,7 @@ ENV SONATYPE_WORK ${SONATYPE_DIR}/sonatype-work
 RUN apk update && apk add openssl && rm -fr /var/cache/apk/*
 RUN mkdir -p /opt/sonatype/ \
   && wget https://download.sonatype.com/nexus/3/nexus-${NEXUS_VERSION}-unix.tar.gz -O - \
-  | tar zx -C "${SONATYPE_DIR}" \
+  | tar zx -C "${SONATYPE_DIR}" && rm -fr ${SONATYPE_WORK} \
   && mv "${SONATYPE_DIR}/nexus-${NEXUS_VERSION}" "${NEXUS_HOME}"
 
 # configure nexus
