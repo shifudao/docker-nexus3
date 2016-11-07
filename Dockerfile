@@ -28,7 +28,7 @@ RUN mkdir -p ${NEXUS_DATA}/etc ${NEXUS_DATA}/log ${NEXUS_DATA}/tmp ${SONATYPE_WO
     && ln -s ${NEXUS_DATA} ${SONATYPE_WORK}/nexus3
 
 ## prevent warning: /opt/sonatype/nexus/etc/org.apache.karaf.command.acl.config.cfg (Permission denied)
-RUN chown nexus:nexus /opt/sonatype/nexus/etc/
+RUN chown nexus /opt/sonatype/nexus/etc/
 
 COPY entrypoint.sh /
 
