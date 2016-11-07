@@ -22,11 +22,10 @@ RUN sed \
      -i ${NEXUS_HOME}/etc/nexus-default.properties
 
 ## create nexus user
-RUN adduser -S -u 200 -D -H -h "${NEXUS_DATA}" -s /bin/false nexus
+RUN adduser -S -u 200 -D -H -h "${NEXUS_DATA}" -s /bin/false nexus nexus
 
 RUN mkdir -p ${NEXUS_DATA}/etc ${NEXUS_DATA}/log ${NEXUS_DATA}/tmp ${SONATYPE_WORK} \
-    && ln -s ${NEXUS_DATA} ${SONATYPE_WORK}/nexus3 \
-    && chown -R nexus:nexus ${NEXUS_DATA}
+    && ln -s ${NEXUS_DATA} ${SONATYPE_WORK}/nexus3
 
 ## prevent warning: /opt/sonatype/nexus/etc/org.apache.karaf.command.acl.config.cfg (Permission denied)
 RUN chown nexus:nexus /opt/sonatype/nexus/etc/
