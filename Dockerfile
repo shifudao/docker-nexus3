@@ -1,41 +1,42 @@
 FROM       openjdk:8-jre-alpine
 MAINTAINER FengYu <yu.feng@shifudao.com>
 
-ENV NEXUS_DATA /nexus-data
 ENV NEXUS_VERSION 3.1.0-04
+
+ENV SONATYPE_DIR /opt/sonatype
+ENV NEXUS_HOME ${SONATYPE_DIR}/nexus
+ENV NEXUS_DATA /nexus-data
+ENV NEXUS_CONTEXT ''
+ENV SONATYPE_WORK ${SONATYPE_DIR}/sonatype-work
 
 # install nexus
 RUN apk update && apk add openssl && rm -fr /var/cache/apk/*
 RUN mkdir -p /opt/sonatype/ \
   && wget https://download.sonatype.com/nexus/3/nexus-${NEXUS_VERSION}-unix.tar.gz -O - \
-  | tar zx -C /opt/sonatype/ \
-  && mv /opt/sonatype/nexus-${NEXUS_VERSION} /opt/sonatype/nexus
+  | tar zx -C "${SONATYPE_DIR}" \
+  && mv "${SONATYPE_DIR}/nexus-${NEXUS_VERSION}" "${NEXUS_HOME}"
 
-## configure nexus runtime env
+# configure nexus
 RUN sed \
-    -e "s|karaf.home=.|karaf.home=/opt/sonatype/nexus|g" \
-    -e "s|karaf.base=.|karaf.base=/opt/sonatype/nexus|g" \
-    -e "s|karaf.etc=etc|karaf.etc=/opt/sonatype/nexus/etc|g" \
-    -e "s|java.util.logging.config.file=etc|java.util.logging.config.file=/opt/sonatype/nexus/etc|g" \
-    -e "s|karaf.data=data|karaf.data=${NEXUS_DATA}|g" \
-    -e "s|java.io.tmpdir=data/tmp|java.io.tmpdir=${NEXUS_DATA}/tmp|g" \
-    -i /opt/sonatype/nexus/bin/nexus.vmoptions
+    -e '/^nexus-context/ s:$:${NEXUS_CONTEXT}:' \
+     -i ${NEXUS_HOME}/etc/nexus-default.properties
 
 ## create nexus user
-RUN echo "nexus:x:200:200:nexus role account:${NEXUS_DATA}:/bin/false" >> /etc/passwd
-RUN echo "nexus:x:200:" >> /etc/group
-RUN echo "nexus:!::0:::::" >> /etc/shadow
+RUN adduser -S -u 200 -D -H -h "${NEXUS_DATA}" -s /bin/false nexus
+
+RUN mkdir -p ${NEXUS_DATA}/etc ${NEXUS_DATA}/log ${NEXUS_DATA}/tmp ${SONATYPE_WORK} \
+    && ln -s ${NEXUS_DATA} ${SONATYPE_WORK}/nexus3 \
+    && chown -R nexus:nexus ${NEXUS_DATA}
 
 ## prevent warning: /opt/sonatype/nexus/etc/org.apache.karaf.command.acl.config.cfg (Permission denied)
-## prevent ERROR: OpenJDK 64-Bit Server VM warning: Cannot open file ../sonatype-work/nexus3/log/jvm.log due to Permission denied
-RUN chown nexus:nexus /opt/sonatype/nexus/etc/ /opt/sonatype/sonatype-work/nexus3/log
+RUN chown nexus:nexus /opt/sonatype/nexus/etc/
 
 COPY entrypoint.sh /
 
 VOLUME ${NEXUS_DATA}
 
 EXPOSE 8081
-WORKDIR /opt/sonatype/nexus
+WORKDIR ${NEXUS_HOME}
 
 ENV JAVA_MAX_MEM 1200m
 ENV JAVA_MIN_MEM 1200m
