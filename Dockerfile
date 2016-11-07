@@ -2,7 +2,7 @@ FROM       openjdk:8-jre-alpine
 MAINTAINER FengYu <yu.feng@shifudao.com>
 
 ENV NEXUS_DATA /nexus-data
-ENV NEXUS_VERSION 3.0.2-02
+ENV NEXUS_VERSION 3.1.0-04
 
 # install nexus
 RUN apk update && apk add openssl && rm -fr /var/cache/apk/*
