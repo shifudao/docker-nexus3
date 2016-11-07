@@ -19,16 +19,16 @@ RUN mkdir -p /opt/sonatype/ \
 # configure nexus
 RUN sed \
     -e '/^nexus-context/ s:$:${NEXUS_CONTEXT}:' \
-     -i ${NEXUS_HOME}/etc/nexus-default.properties
+    -i ${NEXUS_HOME}/etc/nexus-default.properties
 
 ## create nexus user
 RUN adduser -S -u 200 -D -H -h "${NEXUS_DATA}" -s /bin/false nexus nexus
 
-RUN mkdir -p ${NEXUS_DATA}/etc ${NEXUS_DATA}/log ${NEXUS_DATA}/tmp ${SONATYPE_WORK} \
-    && ln -s ${NEXUS_DATA} ${SONATYPE_WORK}/nexus3
+RUN mkdir -p "${NEXUS_DATA}/etc" "${NEXUS_DATA}/log" "${NEXUS_DATA}/tmp" "${SONATYPE_WORK}"
+RUN ln -s ${NEXUS_DATA} ${SONATYPE_WORK}/nexus3
 
 ## prevent warning: /opt/sonatype/nexus/etc/org.apache.karaf.command.acl.config.cfg (Permission denied)
-RUN chown nexus /opt/sonatype/nexus/etc/
+RUN chown nexus "${NEXUS_HOME}/etc/"
 
 COPY entrypoint.sh /
 
